@@ -29,11 +29,11 @@ As I scanned the file at a surface level, I started seeing two distinct patterns
 
 First, I saved all the failed authentication attempts into a master file (`failed_login.log`). Then, I used `grep` to filter and save these two patterns into separate files: `invalid_user.log` and `incorrect_pass.log`.
 
-![Invalid User Logs](/images/inv_user.png)
+![Invalid User Logs](images/inv_user.png)
 
 > **Note:** I added the `-v` argument with `grep` to filter out all the failed attempts that didn't contain the word 'user' to easily isolate existing account failures.
 
-![Separated Files](/images/sepfile.png)
+![Separated Files](images/sepfile.png)
 
 ### Step 3: Identify Source IP Addresses
 After that, I used CLI tools like `cut`, `uniq`, and `sort` to extract the IP addresses and the number of attempts they made on the host.
@@ -42,21 +42,21 @@ I wanted to narrow down the specific IP addresses and their frequency of attacks
 > **Note:** The `-c` argument in `uniq` made counting the repetitive IPs easy.
 
 * **Invalid User IP extraction:**
-![Source IPs - Invalid Users](/images/ipsrc_user.png)
+![Source IPs - Invalid Users](images/ipsrc_user.png)
 
 * **Incorrect Password IP extraction:**
-![Source IPs - Incorrect Passwords](/images/ipsrc_pass.png)
+![Source IPs - Incorrect Passwords](images/ipsrc_pass.png)
 
 ### Step 4: Brute-Force Identification (Anomaly Detection)
 Now that I had the list of IPs, I decided to look into the count (how many times those IPs were on the list).
 
 First, I decided to look into the `ipsrc_incorrectpass.log` file to see if there were any brute-force attempts on a particular system account.
 
-![IP List - Passwords](/images/iplist_pass.png)
+![IP List - Passwords](images/iplist_pass.png)
 
 For this analysis, I decided to ignore other IPs and only focus on `183.62.140.253`, which seems to have made 253 failed attempts. By looking at the sheer volume of attempts (253), we can tell that it was a brute-force attack. Furthermore, I decided to look into which account it was trying to brute-force:
 
-![Brute Force Attempt - Root](/images/bruteattempt_root.png)
+![Brute Force Attempt - Root](images/bruteattempt_root.png)
 
 From the screenshot above, we can confirm the following:
 1. `183.62.140.253` attempted a brute-force attack, as we can see a lot of authentication attempts in less than 1 second.
@@ -66,22 +66,22 @@ I tried to run `cat OpenSSH_2k.log | grep "183.62.140.253" | grep -i -v "fail"` 
 
 Now, it's time to look through the `ipsrc_invaliduser.log`.
 
-![IP List - Users](/images/iplist_user.png)
+![IP List - Users](images/iplist_user.png)
 
 I decided to only focus on `5.188.10.180` for this analysis. It seems this IP made 18 unsuccessful attempts on incorrect usernames.
 
-![Brute Force Attempt - Invalid Users](/images/bruteattempt.png)
+![Brute Force Attempt - Invalid Users](images/bruteattempt.png)
 
 We can see this person tried to attempt logging in with usernames like `admin`, `0`, and `1234`. These usernames don't exist on the main system.
 
 ### Step 5: Common IP Identification
 As we already have the IP list for both invalid user attempts and invalid password attempts, I decided to check if there are any common IPs that appear on both lists.
 
-![Common IPs](/images/comm.png)
+![Common IPs](images/comm.png)
 
 We got to see the familiar IP `183.62.140.253`. So let's check which other accounts that IP attempted to brute-force.
 
-![Extended Common IPs](/images/extcomm.png)
+![Extended Common IPs](images/extcomm.png)
 
 We can see that it also attempted a bunch of other usernames too, showing a wider dictionary attack before focusing on the `root` account.
 
