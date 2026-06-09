@@ -1,31 +1,37 @@
 # Cybersecurity Portfolio
 
 Welcome to my cybersecurity portfolio.
-This repository documents my learning journey, hands-on labs, security investigations, log analysis exercises, threat hunting activities, and cybersecurity projects.
+
+This repository serves as a record of my hands-on cybersecurity journey. Here you'll find lab investigations, security projects, log analysis exercises, threat hunting activities, scripts, and weekly progress reports that reflect my continuous learning and practical experience.
 
 ## About Me
 
-I am an aspiring cybersecurity professional with a strong interest in Blue Team operations, SOC analysis, threat detection, incident response, and security engineering.
-I created this portfolio to document my practical work and continuously improve my technical skills through hands-on learning.
+I'm an aspiring cybersecurity professional focused on Blue Team operations, Security Operations Center (SOC) workflows, threat detection, incident response, and security monitoring.
 
-## Repository Structure
+Rather than relying solely on certifications or theory, I believe in learning by doing. This portfolio documents the labs I've completed, the challenges I've solved, and the skills I'm building through practical, real-world scenarios.
 
-### Weekly Reports
-Weekly summaries of my learning progress, completed labs, projects, and key takeaways.
+## What You'll Find Here
 
-### Lab Writeups
-Detailed walkthroughs and analysis of cybersecurity labs and practical exercises.
+### Lab Investigations & Write-Ups
 
-### Scripts & Tools
-Security-related scripts and automation projects developed during my learning.
+Detailed analyses of cybersecurity labs, including methodology, findings, attack techniques observed, and defensive insights.
 
-## Current Goals
+### Security Projects
 
-* Build a strong cybersecurity portfolio
-* Develop practical Blue Team skills
-* Contribute security projects and research
-* Work as a SOC analyst
+Hands-on projects focused on detection engineering, log analysis, threat hunting, monitoring, automation, and security operations.
 
-## Featured Work
+### Scripts & Automation
 
-This section will be updated as new projects and investigations are completed.
+Custom scripts and tools developed to automate tasks, analyze data, and improve security workflows.
+
+## Current Focus
+
+* Strengthening SOC Analyst and Blue Team skills
+* Improving log analysis and threat detection capabilities
+* Building practical experience through hands-on labs and projects
+* Expanding knowledge of incident response and threat hunting
+* Creating a portfolio that demonstrates real-world cybersecurity skills
+
+## Learning Philosophy
+
+Consistent progress beats occasional intensity.
