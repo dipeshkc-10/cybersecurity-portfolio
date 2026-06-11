@@ -36,7 +36,7 @@ Firstly, I extracted all source IP addresses from the log file and counted the n
 cut -d ' ' -f 1 access.log | uniq -c | sort -n -r
 ```
 
-*(Image: /images/anamol_idi.png)*
+![Top Source IP Addresses](images/anamol_idi.png)
 
 The output showed that **43.133.134.155** appeared significantly more often than any other IP address in the log file. This immediately made it a strong candidate for further investigation.
 
@@ -64,7 +64,7 @@ I extracted all requested URLs to understand what resources the attacker was att
 cut -d '"' -f2 target.log
 ```
 
-*(Image: /images/urls.png)*
+![Requested URLs by 43.133.134.155](images/urls.png)
 
 Many of the requested URLs appeared random and unrelated to the website's normal content. The requests resembled attempts to discover hidden directories, administrative panels, backup files, or other sensitive resources.
 
@@ -82,7 +82,7 @@ Next, I checked the HTTP status codes returned by the server.
 awk '{ print $9 }' target.log
 ```
 
-*(Image: /images/st_code.png)*
+![HTTP Status Codes Returned](images/st_code.png)
 
 Every request returned a **401 (Unauthorized)** status code.
 
@@ -100,7 +100,7 @@ I then extracted the User-Agent field from each request.
 cut -d '"' -f6 target.log
 ```
 
-*(Image: /images/usr_agnt.png)*
+![User-Agent Analysis](images/usr_agnt.png)
 
 The requests contained multiple browser User-Agent strings including Chrome, Firefox, and Safari.
 
@@ -112,7 +112,7 @@ A legitimate user typically browses using a single browser during a short sessio
 
 I reviewed the timestamps associated with the requests.
 
-*(Image: /images/tmstmp.png)*
+![Request Timeline](images/tmstmp.png)
 
 The IP address generated multiple requests within extremely short time intervals. In several cases, five requests were sent within approximately two seconds.
 
