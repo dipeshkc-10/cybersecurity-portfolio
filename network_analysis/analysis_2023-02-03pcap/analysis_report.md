@@ -10,7 +10,7 @@ This report serves as a technical walkthrough of the investigation, providing ti
 ---
 
 ## Incident Overview & Metadata
-* **Analyst:** SOC / Incident Response Analyst
+* **Analyst:** Dipesh KC
 * **Date of Analysis:** June 13, 2026
 * **Incident Date:** February 3, 2023
 * **Artifact Analyzed:** Network Packet Capture (PCAP)
