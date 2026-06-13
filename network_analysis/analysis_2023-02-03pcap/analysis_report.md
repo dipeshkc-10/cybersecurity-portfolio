@@ -11,6 +11,7 @@ This report acts as my technical walkthrough of the investigation. It includes m
 
 ## Incident Overview & Metadata
 * **Analyst:** Dipesh KC
+* **log-source:** https://www.malware-traffic-analysis.net/
 * **Date of Analysis:** June 13, 2026
 * **Incident Date:** February 3, 2023
 * **Artifact Analyzed:** Network Packet Capture (PCAP)
