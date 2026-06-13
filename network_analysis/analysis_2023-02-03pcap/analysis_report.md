@@ -38,11 +38,11 @@ This report serves as a technical walkthrough of the investigation, providing ti
 ### 1. Initial Assessment & Environment Triage
 The forensic process began by evaluating the global capture metrics within the PCAP file properties to establish an operational baseline. 
 
-![File Properties](/images/fileproperty.png)
+![File Properties](image/fileproperty.png)
 
 With a total packet count of **55,207**, manual inspection of individual packets was inefficient. To narrow the analytical scope, network conversation statistics for IPv4 were aggregated and reviewed.
 
-![IPv4 Conversations](/images/convo.png)
+![IPv4 Conversations](image/convo.png)
 
 **Analytical Delineation:**
 * **Host `10.0.0.149`** was identified as the primary node of interest (Server/Victim), maintaining active communication channels with almost all other observed internal endpoints.
@@ -51,26 +51,26 @@ With a total packet count of **55,207**, manual inspection of individual packets
 ### 2. Protocol Hierarchy Inspection & Initial Access Vector
 A macro-level view of the capture utilizing the Protocol Hierarchy tool revealed specific protocols historically abused for staging and post-exploitation: **SMTP, SMB, and HTTP**. 
 
-![Protocol Hierarchy](/images/hir.png)
+![Protocol Hierarchy](image/hir.png)
 
 While the HTTP traffic was minimal (only 4 packets), filtering this protocol uncovered the initial delivery vector.
 
-![HTTP Traffic Analysis](/images/protocol_http.png)
+![HTTP Traffic Analysis](image/protocol_http.png)
 
 The internal server (`10.0.0.149`) initiated a cleartext HTTP GET request to an external rogue IP address (`128.254.207.55`) to retrieve an anomalous file designated as `86607.dat`. 
 
 ### 3. Malware Fingerprinting & Threat Intelligence
 The `86607.dat` file object was forensically extracted directly from the HTTP stream.
 
-![File Extraction](/images/ex_dat.png)
+![File Extraction](image/ex_dat.png)
 
 A cryptographic checksum calculation was performed against the extracted payload to obtain its unique hash identity:
 
-![SHA256 Verification](/images/sha256sum.png)
+![SHA256 Verification](image/sha256sum.png)
 
 Querying this signature against VirusTotal corroborated the malicious classification:
 
-![VirusTotal Results](/images/virustotal.png)
+![VirusTotal Results](image/virustotal.png)
 
 **Threat Intelligence Assessment:**
 The query yielded a **54/69 malicious conviction rate** among security vendors. The threat definitions conclusively classified the binary as a variant of **QakBot (Qbot)**—a modular, evasive banking trojan notorious for stealing credentials, gathering local network topology, and facilitating secondary ransomware deployments.
@@ -78,23 +78,23 @@ The query yielded a **54/69 malicious conviction rate** among security vendors. 
 ### 4. Reconnaissance & Internal Discovery
 Industry threat intelligence (specifically historical tracking by Sophos Labs) indicates that upon establishing a foothold, QakBot routinely invokes network scanning modules (such as localized Address Resolution Protocol [ARP] sweeps) to rapidly discover adjacent operational machines for lateral expansion.
 
-![Sophos Intelligence Reference](/images/sophos.png)
+![Sophos Intelligence Reference](image/sophos.png)
 
 To validate this behavior inside our network ecosystem, a Wireshark display filter was structured exclusively for ARP broadcast events.
 
-![ARP Scan Discovery](/images/arp.png)
+![ARP Scan Discovery](image/arp.png)
 
 The capture confirmed a dense flood of sequential ARP requests originating from the infected server (`10.0.0.149`), mapping physical-to-logical addresses across the local subnet. 
 
 Following the broad ARP discovery sweep, the attacker targeted specific systems with ICMP Echo Requests (pings) to confirm target reachability.
 
-![ICMP Verification](/images/icmp.png)
+![ICMP Verification](image/icmp.png)
 
 The ICMP stream isolated two responsive target nodes: `10.0.0.6` and `10.0.0.1`. 
 
 Further analysis of traffic directed at `10.0.0.1` revealed a massive surge of failed TCP handshakes across a broad spectrum of varying port destinations, documenting an active, automated port-scanning phase.
 
-![Port Scan Signature](/images/prtscn.png)
+![Port Scan Signature](image/prtscn.png)
 
 ### 5. Lateral Movement & Infrastructure Contamination
 Given the earlier identification of SMB traffic and the confirmed reachability of host `10.0.0.6`, the SMB object transmission streams were audited.
@@ -103,7 +103,7 @@ Given the earlier identification of SMB traffic and the confirmed reachability o
 
 The audit caught the transmission of an un-fingerprinted Dynamic Link Library (`.dll`) alongside a paired configuration metadata file (`dll.cfg`) crossing the network boundaries toward `10.0.0.6`. These files were extracted for hash analysis:
 
-![DLL Hash Signature](/images/sha256_dll.png)
+![DLL Hash Signature](image/sha256_dll.png)
 
 **Critical Correlation:**
 Cross-referencing the SHA256 signature of the laterally transferred DLL against the initial access vector confirmed a **100% cryptographic match** to the primary `86607.dat` QakBot payload. This definitively proves that the threat actor successfully executed lateral movement, compromising host `10.0.0.6` via native SMB infrastructure.
@@ -119,7 +119,7 @@ An explicit `AUTH LOGIN` command was transmitted at the threshold of the SMTP co
 
 The stream documented an outbound session to an external server (`122.155.171.181`). Although the server responded with an authentication failure message, the transaction exposed the threat actor's active attempts to pass credentials over the wire. The raw Base64 authentication strings were extracted and loaded into CyberChef for decoding:
 
-![CyberChef Decryption](/images/cyberchef.png)
+![CyberChef Decryption](image/cyberchef.png)
 
 **Analytical Assessment:**
 The Base64 strings successfully decoded into cleartext user credentials. Even though this specific session returned a failure status, the presence of cleartext credential strings inside the packet payload suggests that the malware successfully parsed local credential stores (LSASS/Browsers) on the compromised host and attempted to exfiltrate or reuse them to external SMTP endpoints.
