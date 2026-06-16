@@ -118,18 +118,6 @@ Now we can see the cleartext credentials.
 
 In summary, I can say that it was a successful attack by an attacker. The attacker used a QakBot trojan to gain access to the server (`10.0.0.149`) and then moved laterally to `10.0.0.6`.
 
----
-
-## My Wireshark Display Filter Cheat Sheet
-These are the primary filters I built and applied to isolate the malicious behaviors during this case:
-* **To find the initial payload download:** `http.request.method == "GET" && http.request.uri contains ".dat"`
-* **To isolate the network discovery sweeps:** `arp`
-* **To watch the ping sweeps:** `icmp.type == 8 || icmp.type == 0`
-* **To pinpoint active port scanning flags:** `tcp.flags.syn == 1 && tcp.flags.ack == 0`
-* **To monitor files transferred over network shares:** `smb2.filename`
-* **To catch cleartext email authentication attempts:** `smtp contains "AUTH"`
-
----
 
 ## Timeline Reconstruction
 
