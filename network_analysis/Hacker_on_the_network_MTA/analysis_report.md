@@ -31,61 +31,61 @@ This report details the analysis of a network packet capture (PCAP) involving an
 ### 1. Initial Triage & Noise Reduction
 The PCAP initially contained 12,672 packets. To establish a baseline and narrow the scope, I reviewed the endpoint conversations and protocol hierarchy. 
 
-![File Properties](/images/file_properties.png)
-![Conversations](/images/covo.png)
+![File Properties](images/file_properties.png)
+![Conversations](images/covo.png)
 
 The protocol hierarchy revealed significant traffic across SMB, HTTP, and ARP. 
-![Protocol Hierarchy](/images/protocols.png)
+![Protocol Hierarchy](images/protocols.png)
 
 An initial check of ARP traffic ruled out an active ARP sweep/scan. 
-![ARP Filter](/images/arp_filt.png)
+![ARP Filter](images/arp_filt.png)
 
 Focusing on HTTP GET and POST requests, I observed a high volume of legitimate traffic routing to an internal server at `192.168.1.9`. To isolate anomalous activity, I filtered out HTTP traffic involving this benign server (`http and not ip.addr == 192.168.1.9`).
 
 ### 2. Payload Delivery (`DughwlK.jar`)
 Excluding the benign server exposed suspicious internal communications. The victim (`192.168.1.12`) made an HTTP GET request to `192.168.1.13` over port `8080` to download a file named `DughwlK.jar`. 
 
-![HTTP Excluded](/images/http_exclu.png)
+![HTTP Excluded](images/http_exclu.png)
 
 Following the HTTP stream confirmed the malicious nature of the download. The `User-Agent` was identified as `gnu-classpath` (a core Java library). Inspecting the payload strings within the stream revealed the keywords **"metasploit"** and **"payload"**, strongly indicating this was a generated Metasploit framework attack.
 
-![Follow HTTP Stream](/images/fl_httpstream.png)
-![Scroll HTTP Stream](/images/sc_http_stream.png)
+![Follow HTTP Stream](images/fl_httpstream.png)
+![Scroll HTTP Stream](images/sc_http_stream.png)
 
 ### 3. Malware Analysis & Verification
 I extracted the `.jar` file from the PCAP for further analysis. Running the `strings` command locally verified the presence of the "metasploit" terminology.
 
-![Strings Command](/images/strings.png)
+![Strings Command](images/strings.png)
 
 A cryptographic hash (SHA-256) of the extracted file was generated and queried against VirusTotal. The results confirmed the file is highly malicious, flagged by 35 out of 62 security vendors as a Java hacktool or trojan.
 
-![VirusTotal Results](/images/vt.png)
+![VirusTotal Results](images/vt.png)
 
 ### 4. Command & Control (Reverse Shell)
 Knowing the payload was a Metasploit artifact, I investigated whether it successfully executed by looking for a reverse shell connection. Filtering for TCP connections between the victim and attacker revealed established traffic over port `4444`, a default port for Metasploit listeners.
 
-![TCP Filter](/images/tcp_filt.png)
+![TCP Filter](images/tcp_filt.png)
 
 Following this TCP stream exposed the attacker's interactive command-line session. The attacker successfully gained **root access** to the victim machine. During this session, the attacker issued commands to read sensitive files and initiated a transfer of these files to a newly opened port (`12345`) on their machine.
 
-![Reverse Shell Message](/images/rev_shell_msg.png)
+![Reverse Shell Message](images/rev_shell_msg.png)
 
 ### 5. Data Exfiltration
 I filtered the network traffic for communication directed to destination port `12345`. The captured packets confirmed that the attacker successfully exfiltrated two specific files over this channel:
 1.  `/etc/passwd` (System user information)
 2.  `/root/secret.pdf` (Sensitive document)
 
-![Passwd File](/images/passwdfile.png)
-![PDF File](/images/pdffile.png)
+![Passwd File](images/passwdfile.png)
+![PDF File](images/pdffile.png)
 
 By extracting the packet data containing the PDF and converting it from ASCII to raw bytes, I successfully reconstructed the exfiltrated document. Opening the file revealed a "congratulations" message, confirming the integrity of the captured exfiltration stream.
 
-![Secret PDF](/images/secretpdf.png)
+![Secret PDF](images/secretpdf.png)
 
 ### 6. Lateral Movement Investigation
 A brief investigation into the captured SMB traffic showed mentions of "metasploitable" but yielded no further actionable intelligence. 
 
-![SMB Traffic](/images/smb.png)
+![SMB Traffic](images/smb.png)
 
 To determine the scope of the breach, I analyzed the network communication paths of both the attacker and the victim. `192.168.1.13` only communicated with the victim, and the victim's external communications were limited to the gateway (`192.168.1.1`) and local broadcast (`192.168.1.255`). There was no evidence of lateral movement to other internal endpoints.
 
