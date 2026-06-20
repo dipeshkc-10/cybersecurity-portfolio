@@ -6,7 +6,7 @@ This report details the analysis of a network packet capture (PCAP) involving an
 ---
 
 ## Environment & Entity Overview
-
+* **Analyst:** Dipesh KC
 * **Victim Machine:** `192.168.1.12`
 * **Attacker Machine:** `192.168.1.13` (Internal)
 * **Benign Internal Server:** `192.168.1.9` 
@@ -55,7 +55,7 @@ Following the HTTP stream confirmed the malicious nature of the download. The `U
 ### 3. Malware Analysis & Verification
 I extracted the `.jar` file from the PCAP for further analysis. Running the `strings` command locally verified the presence of the "metasploit" terminology.
 
-![Strings Command](images/strings.png)
+![Strings Command](images/stings.png)
 
 A cryptographic hash (SHA-256) of the extracted file was generated and queried against VirusTotal. The results confirmed the file is highly malicious, flagged by 35 out of 62 security vendors as a Java hacktool or trojan.
 
@@ -80,7 +80,7 @@ I filtered the network traffic for communication directed to destination port `1
 
 By extracting the packet data containing the PDF and converting it from ASCII to raw bytes, I successfully reconstructed the exfiltrated document. Opening the file revealed a "congratulations" message, confirming the integrity of the captured exfiltration stream.
 
-![Secret PDF](images/secretpdf.png)
+![Secret PDF](images/secrepdf.png)
 
 ### 6. Lateral Movement Investigation
 A brief investigation into the captured SMB traffic showed mentions of "metasploitable" but yielded no further actionable intelligence. 
