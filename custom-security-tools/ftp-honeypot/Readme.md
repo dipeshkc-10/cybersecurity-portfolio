@@ -2,6 +2,10 @@
 
 A lightweight FTP honeypot server written in Python. Simulates a real FTP server to lure and log unauthorized access attempts, built from scratch without any FTP libraries.
 
+## Design (Please Note)
+
+This honeypot uses a **virtual filesystem** instead of exposing the host's real filesystem. The virtual filesystem simulates directories and files that appear realistic to attackers while preventing them from interacting with or discovering actual system files. This improves isolation, reduces risk if the honeypot is compromised, and allows the environment to be fully controlled for logging and analysis.
+
 ## Features
 
 - Active (PORT) and passive (PASV) mode support
