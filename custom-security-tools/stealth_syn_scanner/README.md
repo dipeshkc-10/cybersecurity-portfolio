@@ -14,10 +14,3 @@ Unlike standard full-connect TCP scanners that complete the 3-way handshake (lea
 ## Prerequisites
 * Python 3.7+
 * `root` or `sudo` privileges (required by Scapy to craft raw packets)
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone [https://github.com/yourusername/stealth-syn-scanner.git](https://github.com/yourusername/stealth-syn-scanner.git)
-   cd stealth-syn-scanner
